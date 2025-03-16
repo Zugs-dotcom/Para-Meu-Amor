@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pergunta Interativa</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      position: relative;
+      background: pink;
+      overflow: hidden; /* Evita barras de rolagem por causa dos elementos animados */
+    }
+    h1 {
+      margin-bottom: 40px;
+      z-index: 1;
+      transition: opacity 1s;
+    }
+    /* Mensagem de amor que aparecerá */
+    #message {
+      display: none;
+      position: absolute;
+      top: calc(50% - 200px);
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 48px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+      z-index: 2;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      position: absolute;
+      z-index: 1;
+      background-color: red;
+      border: none;
+      color: white;
+      transition: left 2s, top 2s;
+    }
+    button:hover {
+      background-color: darkred;
+    }
+    /* Posição inicial dos botões */
+    #sim {
+      left: calc(50% - 150px);
+      top: calc(50% + 100px);
+    }
+    #nao {
+      left: calc(50% + 50px);
+      top: calc(50% + 100px);
+    }
+    /* Estilo e animação dos corações flutuantes */
+    .heart {
+      position: absolute;
+      top: 100vh; /* Inicia na parte inferior da tela */
+      color: red;
+      pointer-events: none;
+      animation-name: float;
+      animation-timing-function: linear;
+    }
+    @keyframes float {
+      0% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh);
+        opacity: 0;
+      }
+    }
+    /* Estilo para o botão transformado em coração */
+    .heart-shape {
+      width: 100px;
+      height: 90px;
+      background-color: red;
+      transform: rotate(-45deg);
+      left: calc(50% - 50px) !important;
+      top: calc(50% - 45px) !important;
+      padding: 0;
+      transition: left 2s, top 2s;
+    }
+    .heart-shape .heart-part {
+      position: absolute;
+      width: 100px;
+      height: 90px;
+      background-color: red;
+      border-radius: 50%;
+    }
+    .heart-shape .heart-part.left {
+      top: -50px;
+      left: 0;
+    }
+    .heart-shape .heart-part.right {
+      top: 0;
+      left: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Isabella Pergunta? Você me Ama Muito?</h1>
+  <div id="message">EU TE AMO MAIS QUE TUDO NESSA VIDA!</div>
+  <button id="sim">Sim</button>
+  <button id="nao">Não</button>
+
+  <script>
+    const naoBtn = document.getElementById('nao');
+    const simBtn = document.getElementById('sim');
+    const h1 = document.querySelector('h1');
+    const message = document.getElementById('message');
+
+    // Função para mover o botão "Não" para uma posição aleatória pela tela
+    function moveButton() {
+      const btnRect = naoBtn.getBoundingClientRect();
+      const maxX = window.innerWidth - btnRect.width;
+      const maxY = window.innerHeight - btnRect.height;
+      const randomX = Math.floor(Math.random() * maxX);
+      const randomY = Math.floor(Math.random() * maxY);
+      naoBtn.style.left = randomX + 'px';
+      naoBtn.style.top = randomY + 'px';
+    }
+    naoBtn.addEventListener('mouseover', moveButton);
+
+    // Função para criar um coração flutuante
+    function createHeart() {
+      const heart = document.createElement("div");
+      heart.classList.add("heart");
+      heart.innerHTML = "&#10084;"; // Símbolo de coração
+      heart.style.left = Math.random() * 100 + "vw"; // Posição horizontal aleatória
+      heart.style.fontSize = (21 + Math.random() * 30) + "px"; // Tamanho aleatório
+      heart.style.animationDuration = (1 + Math.random() * 2) + "s"; // Duração aleatória da animação
+      document.body.appendChild(heart);
+      // Remove o coração após a animação (aproximadamente 5 segundos)
+      setTimeout(() => {
+        heart.remove();
+      }, 60000);
+    }
+
+    // Função para iniciar o efeito de corações flutuantes
+    function startHeartEffect() {
+      const interval = setInterval(createHeart, 200);
+      setTimeout(() => {
+        clearInterval(interval);
+      }, 5000);
+    }
+
+    // Ao clicar em "Sim", inicia o efeito de corações, transforma o botão em coração,
+    // move o coração até o centro, esconde o título e exibe a nova mensagem, além de fazer o botão "Não" sumir.
+    simBtn.addEventListener('click', () => {
+      startHeartEffect();
+
+      // Esconde o título com transição
+      h1.style.opacity = 0;
+      setTimeout(() => {
+        h1.style.display = 'none';
+      }, 1000);
+
+      // Exibe a nova mensagem
+      message.style.display = 'block';
+
+      // Faz o botão "Não" desaparecer
+      naoBtn.style.display = 'none';
+
+      // Transforma o botão "Sim" em um coração
+      simBtn.innerHTML = ""; // Remove o texto
+      simBtn.classList.add("heart-shape");
+
+      // Cria os elementos para formar as partes arredondadas do coração
+      const leftPart = document.createElement("div");
+      leftPart.classList.add("heart-part", "left");
+      const rightPart = document.createElement("div");
+      rightPart.classList.add("heart-part", "right");
+      simBtn.appendChild(leftPart);
+      simBtn.appendChild(rightPart);
+    });
+  </script>
+</body>
+</html>
